@@ -1,0 +1,137 @@
+-- QUERIES 
+-- 1. Display all airplanes with their manufacturers 
+ 
+SELECT  
+    airplane.plane_no,  
+    plane_model.model_no,  
+    plane_model.manufacturer,  
+    airplane.capacity 
+FROM airplane 
+JOIN plane_model 
+    ON airplane.model_id = plane_model.model_id; 
+ -- 2. Show airplanes that are currently parked in hangars 
+ 
+SELECT 
+    airplane.plane_no, 
+    hangar.hangar_no, 
+    hangar_history.in_datetime 
+FROM hangar_history 
+JOIN airplane 
+    ON hangar_history.plane_id = airplane.plane_id 
+ 
+JOIN hangar 
+    ON hangar_history.hangar_id = hangar.hangar_id 
+WHERE hangar_history.out_datetime IS NULL; 
+ -- 3. Count how many airplanes belong to each manufacturer 
+ 
+SELECT 
+    plane_model.manufacturer, 
+    COUNT(airplane.plane_id) AS total_airplanes 
+FROM airplane 
+JOIN plane_model 
+    ON airplane.model_id = plane_model.model_id 
+GROUP BY plane_model.manufacturer; 
+ -- 4. Find the airplane with the largest passenger capacity 
+ 
+SELECT 
+    plane_no, 
+    capacity 
+FROM airplane 
+ORDER BY capacity DESC 
+LIMIT 1; 
+ -- 5. Calculate the average salary of airport employees 
+ 
+SELECT 
+    ROUND(AVG(salary), 2) AS average_salary 
+FROM employee; 
+ -- 6. Show technicians together with their expertise level 
+ 
+SELECT 
+    employee.first_name, 
+    employee.last_name, 
+    technician.specialization_level 
+FROM technician 
+JOIN employee 
+    ON technician.ssn = employee.ssn; 
+ 
+ -- 7. List all tests completed with airplane numbers 
+ 
+SELECT 
+    airplane.plane_no, 
+    test.test_name, 
+    test_event.score, 
+    test_event.test_date 
+FROM test_event 
+JOIN airplane 
+    ON test_event.plane_id = airplane.plane_id 
+JOIN test 
+    ON test_event.test_id = test.test_id; 
+ -- 8. Find the technician who completed the highest number of tests 
+ 
+SELECT 
+    technician_id, 
+    COUNT(event_id) AS completed_tests 
+FROM test_event 
+GROUP BY technician_id 
+ORDER BY completed_tests DESC 
+LIMIT 1; 
+ -- 9. Show airplanes that never received a test 
+ 
+SELECT 
+    plane_no 
+FROM airplane 
+WHERE plane_id NOT IN ( 
+    SELECT plane_id 
+    FROM test_event 
+); 
+ -- 10. Calculate the average score achieved by each airplane 
+ 
+SELECT 
+    airplane.plane_no, 
+ 
+    ROUND(AVG(test_event.score), 2) AS average_test_score 
+FROM test_event 
+JOIN airplane 
+    ON test_event.plane_id = airplane.plane_id 
+GROUP BY airplane.plane_no; 
+ -- 11. Display total hours spent by technicians on testing 
+ 
+SELECT 
+    technician_id, 
+    SUM(hours_spent) AS total_hours_worked 
+FROM test_event 
+GROUP BY technician_id; 
+ -- 12. Show all employees hired after the year 2020 
+ 
+SELECT 
+    first_name, 
+    last_name, 
+    hire_date 
+FROM employee 
+WHERE hire_date > '2020-01-01'; 
+ -- 13. Find the most frequently used hangar 
+ 
+SELECT 
+    hangar.hangar_no, 
+    COUNT(hangar_history.history_id) AS usage_frequency 
+FROM hangar_history 
+JOIN hangar 
+    ON hangar_history.hangar_id = hangar.hangar_id 
+GROUP BY hangar.hangar_no 
+ORDER BY usage_frequency DESC 
+LIMIT 1; 
+ -- 14. Show flight schedules with departure and arrival cities 
+ 
+SELECT 
+ 
+    flight_no, 
+    departure_city, 
+    arrival_city, 
+    departure_time 
+FROM flight; 
+ -- 15. Count airplanes based on their current operational status 
+SELECT 
+    status, 
+    COUNT(*) AS total_planes 
+FROM airplane 
+GROUP BY status; 
