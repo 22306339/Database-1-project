@@ -1,0 +1,128 @@
+-- Stores airplane model information 
+CREATE TABLE plane_model ( 
+    model_id INT AUTO_INCREMENT PRIMARY KEY, 
+    model_no VARCHAR(30) UNIQUE NOT NULL, 
+    manufacturer VARCHAR(50) NOT NULL, 
+    max_range INT, 
+    fuel_capacity INT 
+); 
+ 
+ -- Stores airplane details 
+CREATE TABLE airplane ( 
+    plane_id INT AUTO_INCREMENT PRIMARY KEY, 
+    plane_no VARCHAR(20) UNIQUE NOT NULL, 
+    model_id INT NOT NULL, 
+    capacity INT NOT NULL, 
+    manufacture_year YEAR, 
+    status VARCHAR(20), 
+ 
+    CONSTRAINT fk_airplane_model 
+        FOREIGN KEY (model_id) 
+        REFERENCES plane_model(model_id) 
+); 
+ -- Stores hangar information 
+CREATE TABLE hangar ( 
+    hangar_id INT AUTO_INCREMENT PRIMARY KEY, 
+    hangar_no VARCHAR(10) UNIQUE NOT NULL, 
+    location VARCHAR(100), 
+    capacity INT 
+); 
+ -- Tracks airplane movement in and out of hangars 
+CREATE TABLE hangar_history ( 
+    history_id INT AUTO_INCREMENT PRIMARY KEY, 
+ 
+    plane_id INT NOT NULL, 
+    hangar_id INT NOT NULL, 
+    in_datetime DATETIME NOT NULL, 
+    out_datetime DATETIME, 
+ 
+    CONSTRAINT fk_history_plane 
+        FOREIGN KEY (plane_id) 
+        REFERENCES airplane(plane_id), 
+ 
+    CONSTRAINT fk_history_hangar 
+        FOREIGN KEY (hangar_id) 
+        REFERENCES hangar(hangar_id) 
+); 
+ -- Stores airport employee information 
+CREATE TABLE employee ( 
+    ssn VARCHAR(20) PRIMARY KEY, 
+    first_name VARCHAR(50) NOT NULL, 
+    last_name VARCHAR(50) NOT NULL, 
+    phone VARCHAR(20), 
+    hire_date DATE, 
+    salary DECIMAL(10,2), 
+    employee_type VARCHAR(30), 
+    union_membership_no VARCHAR(30) UNIQUE 
+); 
+ -- Stores technician details 
+CREATE TABLE technician ( 
+    technician_id INT AUTO_INCREMENT PRIMARY KEY, 
+    ssn VARCHAR(20) NOT NULL, 
+    expert_model_id INT NOT NULL, 
+    specialization_level VARCHAR(30), 
+ 
+    CONSTRAINT fk_technician_employee 
+        FOREIGN KEY (ssn) 
+        REFERENCES employee(ssn), 
+ 
+    CONSTRAINT fk_technician_model 
+ 
+        FOREIGN KEY (expert_model_id) 
+        REFERENCES plane_model(model_id) 
+); 
+ -- Stores airplane testing information 
+CREATE TABLE test ( 
+    test_id INT AUTO_INCREMENT PRIMARY KEY, 
+    test_name VARCHAR(50) NOT NULL, 
+    description TEXT, 
+    max_score INT 
+); 
+ -- Stores records of airplane tests performed by technicians 
+CREATE TABLE test_event ( 
+    event_id INT AUTO_INCREMENT PRIMARY KEY, 
+    plane_id INT NOT NULL, 
+    technician_id INT NOT NULL, 
+    test_id INT NOT NULL, 
+    test_date DATE, 
+    hours_spent DECIMAL(4,2), 
+    score INT, 
+ 
+    CONSTRAINT fk_testevent_plane 
+        FOREIGN KEY (plane_id) 
+        REFERENCES airplane(plane_id), 
+ 
+    CONSTRAINT fk_testevent_technician 
+        FOREIGN KEY (technician_id) 
+        REFERENCES technician(technician_id), 
+ 
+    CONSTRAINT fk_testevent_test 
+        FOREIGN KEY (test_id) 
+        REFERENCES test(test_id) 
+); 
+ -- Stores flight information 
+CREATE TABLE flight ( 
+    flight_id INT AUTO_INCREMENT PRIMARY KEY, 
+ 
+    flight_no VARCHAR(20) UNIQUE NOT NULL, 
+    plane_id INT NOT NULL, 
+    departure_city VARCHAR(50), 
+    arrival_city VARCHAR(50), 
+    departure_time DATETIME, 
+    arrival_time DATETIME, 
+ 
+    CONSTRAINT fk_flight_plane 
+        FOREIGN KEY (plane_id) 
+        REFERENCES airplane(plane_id) 
+); 
+ -- Stores traffic controller information 
+CREATE TABLE traffic_controller ( 
+    controller_id INT AUTO_INCREMENT PRIMARY KEY, 
+    ssn VARCHAR(20) NOT NULL, 
+    last_medical_exam DATE, 
+ 
+    CONSTRAINT fk_controller_employee 
+        FOREIGN KEY (ssn) 
+        REFERENCES employee(ssn) 
+); 
+
