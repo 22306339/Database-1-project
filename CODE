@@ -208,7 +208,7 @@ INSERT INTO traffic_controller (
 VALUES 
  
     ('TR10047', '2026-03-14'), 
-TR10049', '2024-05-20'); -- Insert Data into Test Table -- Add airplane safety and maintenance tests 
+('TR10049', '2024-05-20'); -- Insert Data into Test Table -- Add airplane safety and maintenance tests 
 INSERT INTO test ( 
     test_name, 
     description, 
