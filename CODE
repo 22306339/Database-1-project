@@ -1,0 +1,280 @@
+-- Stores airplane model information 
+CREATE TABLE plane_model ( 
+    model_id INT AUTO_INCREMENT PRIMARY KEY, 
+    model_no VARCHAR(30) UNIQUE NOT NULL, 
+    manufacturer VARCHAR(50) NOT NULL, 
+    max_range INT, 
+    fuel_capacity INT 
+); 
+ 
+ -- Stores airplane details 
+CREATE TABLE airplane ( 
+    plane_id INT AUTO_INCREMENT PRIMARY KEY, 
+    plane_no VARCHAR(20) UNIQUE NOT NULL, 
+    model_id INT NOT NULL, 
+    capacity INT NOT NULL, 
+    manufacture_year YEAR, 
+    status VARCHAR(20), 
+ 
+    CONSTRAINT fk_airplane_model 
+        FOREIGN KEY (model_id) 
+        REFERENCES plane_model(model_id) 
+); 
+ -- Stores hangar information 
+CREATE TABLE hangar ( 
+    hangar_id INT AUTO_INCREMENT PRIMARY KEY, 
+    hangar_no VARCHAR(10) UNIQUE NOT NULL, 
+    location VARCHAR(100), 
+    capacity INT 
+); 
+ -- Tracks airplane movement in and out of hangars 
+CREATE TABLE hangar_history ( 
+    history_id INT AUTO_INCREMENT PRIMARY KEY, 
+ 
+    plane_id INT NOT NULL, 
+    hangar_id INT NOT NULL, 
+    in_datetime DATETIME NOT NULL, 
+    out_datetime DATETIME, 
+ 
+    CONSTRAINT fk_history_plane 
+        FOREIGN KEY (plane_id) 
+        REFERENCES airplane(plane_id), 
+ 
+    CONSTRAINT fk_history_hangar 
+        FOREIGN KEY (hangar_id) 
+        REFERENCES hangar(hangar_id) 
+); 
+ -- Stores airport employee information 
+CREATE TABLE employee ( 
+    ssn VARCHAR(20) PRIMARY KEY, 
+    first_name VARCHAR(50) NOT NULL, 
+    last_name VARCHAR(50) NOT NULL, 
+    phone VARCHAR(20), 
+    hire_date DATE, 
+    salary DECIMAL(10,2), 
+    employee_type VARCHAR(30), 
+    union_membership_no VARCHAR(30) UNIQUE 
+); 
+ -- Stores technician details 
+CREATE TABLE technician ( 
+    technician_id INT AUTO_INCREMENT PRIMARY KEY, 
+    ssn VARCHAR(20) NOT NULL, 
+    expert_model_id INT NOT NULL, 
+    specialization_level VARCHAR(30), 
+ 
+    CONSTRAINT fk_technician_employee 
+        FOREIGN KEY (ssn) 
+        REFERENCES employee(ssn), 
+ 
+    CONSTRAINT fk_technician_model 
+ 
+        FOREIGN KEY (expert_model_id) 
+        REFERENCES plane_model(model_id) 
+); 
+ -- Stores airplane testing information 
+CREATE TABLE test ( 
+    test_id INT AUTO_INCREMENT PRIMARY KEY, 
+    test_name VARCHAR(50) NOT NULL, 
+    description TEXT, 
+    max_score INT 
+); 
+ -- Stores records of airplane tests performed by technicians 
+CREATE TABLE test_event ( 
+    event_id INT AUTO_INCREMENT PRIMARY KEY, 
+    plane_id INT NOT NULL, 
+    technician_id INT NOT NULL, 
+    test_id INT NOT NULL, 
+    test_date DATE, 
+    hours_spent DECIMAL(4,2), 
+    score INT, 
+ 
+    CONSTRAINT fk_testevent_plane 
+        FOREIGN KEY (plane_id) 
+        REFERENCES airplane(plane_id), 
+ 
+    CONSTRAINT fk_testevent_technician 
+        FOREIGN KEY (technician_id) 
+        REFERENCES technician(technician_id), 
+ 
+    CONSTRAINT fk_testevent_test 
+        FOREIGN KEY (test_id) 
+        REFERENCES test(test_id) 
+); 
+ -- Stores flight information 
+CREATE TABLE flight ( 
+    flight_id INT AUTO_INCREMENT PRIMARY KEY, 
+ 
+    flight_no VARCHAR(20) UNIQUE NOT NULL, 
+    plane_id INT NOT NULL, 
+    departure_city VARCHAR(50), 
+    arrival_city VARCHAR(50), 
+    departure_time DATETIME, 
+    arrival_time DATETIME, 
+ 
+    CONSTRAINT fk_flight_plane 
+        FOREIGN KEY (plane_id) 
+        REFERENCES airplane(plane_id) 
+); 
+ -- Stores traffic controller information 
+CREATE TABLE traffic_controller ( 
+    controller_id INT AUTO_INCREMENT PRIMARY KEY, 
+    ssn VARCHAR(20) NOT NULL, 
+    last_medical_exam DATE, 
+ 
+    CONSTRAINT fk_controller_employee 
+        FOREIGN KEY (ssn) 
+        REFERENCES employee(ssn) 
+); 
+ -- Insert Data into Plane Model Table -- Add different airplane models used at the airport 
+INSERT INTO plane_model ( 
+    model_no, 
+    manufacturer, 
+    max_range, 
+    fuel_capacity 
+) 
+VALUES 
+    ('A350', 'Airbus', 15000, 141000), 
+    ('B777', 'Boeing', 9700, 181000), 
+    ('E190', 'Embraer', 4500, 13000), 
+    ('CRJ900', 'Bombardier', 2900, 9300); 
+ -- Insert Data into Airplane Table 
+ -- Add airplane information 
+INSERT INTO airplane ( 
+    plane_no, 
+    model_id, 
+    capacity, 
+    manufacture_year, 
+    status 
+) 
+VALUES 
+    ('ERC-4521', 1, 325, 2021, 'Active'), 
+    ('SKY-8820', 2, 396, 2017, 'Maintenance'), 
+    ('NCA-1193', 3, 114, 2019, 'Active'), 
+    ('FLY-7744', 4, 90, 2016, 'Inactive'); 
+ -- Insert Data into Hangar Table -- Add airport hangars and their locations 
+INSERT INTO hangar ( 
+    hangar_no, 
+    location, 
+    capacity 
+) 
+VALUES 
+    ('HG-A1', 'East Terminal', 6), 
+    ('HG-B3', 'West Maintenance Area', 4), 
+    ('HG-C2', 'Northern Zone', 8); 
+ -- Insert Data into Hangar History Table -- Record airplane movement in and out of hangars 
+INSERT INTO hangar_history ( 
+    plane_id, 
+    hangar_id, 
+    in_datetime, 
+    out_datetime 
+) 
+VALUES 
+    (1, 1, '2026-04-01 07:45:00', '2026-04-03 15:20:00'), 
+    (2, 2, '2026-04-10 12:10:00', NULL), 
+    (3, 3, '2026-04-15 09:30:00', '2026-04-16 18:00:00'), 
+ 
+    (4, 1, '2026-05-02 14:15:00', NULL); 
+ 
+ -- Insert Data into Employee Table -- Add airport employees 
+INSERT INTO employee ( 
+    ssn, 
+    first_name, 
+    last_name, 
+    phone, 
+    hire_date, 
+    salary, 
+    employee_type, 
+    union_membership_no 
+) 
+VALUES 
+    ('TR10045', 'Kemal', 'Arslan', '05331112233', '2018-02-11', 7200, 'Technician', 'UN5501'), 
+    ('TR10046', 'Selin', 'Demir', '05334445566', '2020-09-18', 6800, 'Technician', 'UN5502'), 
+    ('TR10047', 'Burak', 'Yildiz', '05337778899', '2017-05-22', 8400, 'Traffic Controller', 'UN5503'), 
+    ('TR10048', 'Leyla', 'Kurt', '05330001122', '2022-01-10', 5900, 'Administration', 'UN5504'), 
+    ('TR10049', 'Ahmet', 'Kamil', '05330159872', '2019-04-10', 8000, 'Traffic controller', 'UN5505'); 
+ -- Insert Data into Technician Table -- Add technicians and their plane model expertise 
+INSERT INTO technician ( 
+    ssn, 
+    expert_model_id, 
+    specialization_level 
+) 
+VALUES 
+    ('TR10045', 1, 'Advanced'), 
+    ('TR10046', 3, 'Intermediate'); -- Add traffic controller medical examination records 
+INSERT INTO traffic_controller ( 
+    ssn, 
+    last_medical_exam 
+) 
+VALUES 
+ 
+    ('TR10047', '2026-03-14'), 
+TR10049', '2024-05-20'); -- Insert Data into Test Table -- Add airplane safety and maintenance tests 
+INSERT INTO test ( 
+    test_name, 
+    description, 
+    max_score 
+) 
+VALUES 
+    ( 
+        'Landing Gear Inspection', 
+        'Checks landing gear safety and pressure systems', 
+        100 
+    ), 
+    ( 
+        'Cabin Pressure Test', 
+        'Measures cabin pressure stability during flight simulation', 
+        100 
+    ), 
+    ( 
+        'Fuel System Analysis', 
+        'Examines fuel delivery and leakage conditions', 
+        100 
+    ); -- Insert Data into Test Event Table -- Record airplane test activities performed by technicians 
+INSERT INTO test_event ( 
+    plane_id, 
+    technician_id, 
+    test_id, 
+    test_date, 
+    hours_spent, 
+    score 
+) 
+VALUES 
+    (1, 1, 1, '2026-04-08', 4.5, 92), 
+    (2, 1, 3, '2026-04-12', 6.0, 81), 
+ 
+    (3, 2, 2, '2026-04-19', 3.0, 97), 
+    (1, 2, 2, '2026-05-01', 2.5, 88); 
+ -- Insert Data into Flight Table -- Add airport flight schedules 
+INSERT INTO flight ( 
+    flight_no, 
+    plane_id, 
+    departure_city, 
+    arrival_city, 
+    departure_time, 
+    arrival_time 
+) 
+VALUES 
+    ( 
+        'EC742', 
+        1, 
+        'Lefkosa', 
+        'Dubai', 
+        '2026-05-20 06:00:00', 
+        '2026-05-20 10:45:00' 
+    ), 
+    ( 
+        'NX188', 
+        2, 
+        'Istanbul', 
+        'Berlin', 
+        '2026-05-21 11:20:00', 
+        '2026-05-21 14:10:00' 
+    ), 
+    ( 
+        'QA909', 
+        3, 
+        'Ankara', 
+        'Rome', 
+        '2026-05-22 08:15:00', 
+        '2026-05-22 11:00:00' 
+    );
